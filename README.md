@@ -183,6 +183,17 @@ npm run inspector
 
 Set `KADRAN_H_HOME` to move the store. The default is `~/.kadran-h`. Delete `history.json` inside that directory to reset the anti-repeat memory.
 
+## Contributing
+
+The easiest contribution is a new anchor or mode ideal in `src/lattice/domains.json`. Keep labels to 2–4 words, add the concept to one domain, then run:
+
+```bash
+npm run typecheck
+npm test
+```
+
+For code changes, include a test that fails without the change. Open a pull request against `main`; CI runs on Node 20, 22, and 24.
+
 <details>
 <summary>Troubleshooting</summary>
 
