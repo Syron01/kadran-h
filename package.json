@@ -1,0 +1,39 @@
+{
+  "name": "kadran-h",
+  "version": "0.1.0",
+  "description": "Homomorphic Quotient-Manifold Steering: a local MCP server and agent skill that breaks LLM mode collapse.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "kadran-h": "./dist/mcp/server.js"
+  },
+  "files": [
+    "dist",
+    "skills",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "bench": "tsx scripts/bench.ts",
+    "samples": "tsx scripts/samples.ts",
+    "smoke": "node scripts/smoke.mjs",
+    "inspector": "npx @modelcontextprotocol/inspector node dist/mcp/server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsup": "^9.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^5.1.0"
+  }
+}
