@@ -75,6 +75,12 @@ The directive has one job: tell the model what must survive, what must not appea
 | `ANCHOR` | Primary concept plus a secondary concept from another domain. |
 | `HASH` | 64-bit SimHash used by `commit_output` and the novelty check. |
 
+## Why not raise temperature?
+
+Temperature changes how randomly the model samples. It has no idea which directions are the domain's clichés, so a high value produces more variance and more broken structure: code that stops compiling, music that loses its pulse, layouts that stop reading.
+
+KADRAN-H removes named stock patterns from a fixed concept space and keeps the task's kernel fixed. The model still writes the answer; it starts from a different lens instead of a noisier one.
+
 ## How it works
 
 ```mermaid
@@ -129,6 +135,10 @@ Each pack has 36 anchors and 16 mode ideals. The 180 anchors span computer scien
 
 `src/lattice/domains.json` is the contribution surface. Adding anchors or mode ideals requires no code: keep labels short, add the concept to the relevant array, and run `npm test`.
 
+## Privacy and state
+
+The server speaks stdio and makes no outbound requests. It does not store prompts, source code, or generated text. `~/.kadran-h/history.json` holds 64-bit hashes, anchor labels, domain keys, same/near/far counters, and the pattern tags passed to `commit_output`. Set `KADRAN_H_HOME` to relocate it. Deleting the file resets the anti-repeat memory.
+
 ## Performance
 
 Measured on Node v24.19.0, Windows 11, Intel i7-14650HX. Reproduce with `npm run bench`.
@@ -139,6 +149,18 @@ Measured on Node v24.19.0, Windows 11, Intel i7-14650HX. Reproduce with `npm run
 | File-backed steering | 200 | 1.279 ms | 1.689 ms | 1.970 ms | 18–21 |
 
 The file-backed row includes the atomic write to `~/.kadran-h/history.json`. The hard token cap is 35; the benchmark workload stays below it. No remote API, no model call, no neural embedding model.
+
+## Verification
+
+`npm test` runs 12 tests: quotient rejection, kernel and orbit-norm preservation, Sobol permutations, SimHash determinism, 30 unique anchors and hashes in under 100 ms, 35-token caps across every domain, persistent telemetry, and aliases.
+
+```text
+$ npm test
+Test Files  1 passed (1)
+Tests       12 passed (12)
+```
+
+CI runs typecheck, tests, build, and a real stdio MCP handshake (`npm run smoke`) on Node 20, 22, and 24.
 
 ## Limitations
 
@@ -160,6 +182,17 @@ npm run inspector
 ```
 
 Set `KADRAN_H_HOME` to move the store. The default is `~/.kadran-h`. Delete `history.json` inside that directory to reset the anti-repeat memory.
+
+<details>
+<summary>Troubleshooting</summary>
+
+- `Cannot find module .../dist/mcp/server.js`: run `npm run build` after `npm ci`.
+- Windows MCP config cannot start the server: use forward slashes in `args` or escape each backslash in JSON.
+- Manual tool inspection: `npx @modelcontextprotocol/inspector node dist/mcp/server.js`.
+- `alpha` outside 0..1: the MCP input schema rejects it; pass a value between 0 and 1.
+- Reset memory: delete `~/.kadran-h/history.json`, or the file under `KADRAN_H_HOME`.
+
+</details>
 
 ## License
 
